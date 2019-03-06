@@ -35,6 +35,7 @@ using System.Diagnostics;
  */
 
 /* TO DO:
+ *      - If the folders 'documentation', 'log' or 'backup' does not exist, then create the directories and fill them with the necessary files (only documentation is essential?).
  *      - Sikr at filer kan nåes på netværksdrevene, så SVEND kan køres lokalt via genveje.
  *      - Fill file_documentation with some pretty html.
  *      - Add automatic school address if the student's practical training company is a known school.
