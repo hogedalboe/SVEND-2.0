@@ -12,7 +12,15 @@ using System.Drawing.Printing;
 using Word = Microsoft.Office.Interop.Word;
 using System.Diagnostics;
 
-/* Changelog:
+/* ABOUT:
+ *      Developed by: Nikolaj Høgedal Boe
+ *      For: Industriens Uddannelser
+ *      https://iu.dk/om-os/iu-organisation/about-us/
+ * 
+ * 
+ * /
+
+/* CHANGELOG:
  * 
  * 2019-03-05: 
  *      - More user friendly review of errors in the certificates after printing.
@@ -21,9 +29,9 @@ using System.Diagnostics;
  *
  * 2019-02-28: 
  *      - Optimization of data exchange between Form1 and Form2 upon Form2 close: [CL:1]
- * 
- * 
- * TO DO:
+ */
+
+/* TO DO:
  *      - Fjernelse af karakter1 ved Hanne Doe medfører ikke en fejl, som det ellers er forventet jf. [CL:2]
  *      - Fill file_documentation with some pretty html.
  *      - Add automatic school address if the student's practical training company is a known school.
