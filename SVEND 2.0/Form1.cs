@@ -16,14 +16,14 @@ using System.Diagnostics;
  *      Developed by: Nikolaj Høgedal Boe
  *      For: Industriens Uddannelser
  *      https://iu.dk/om-os/iu-organisation/about-us/
- * 
- * 
  * /
 
 /* CHANGELOG:
  * 
  * 2019-03-06:
- *      - Replaced empty string expression 'str == ""' with string.IsNullOrEmpty(str)
+ *      - Replaced empty string expression 'str == ""' with string.IsNullOrEmpty(str): [CL:2]
+ *      - Adding debug message to log_error(): [CL:3]
+ *      - Removing the handling of dublicate certificate paths by replacing '1' with '2', which obviously threw an exception when folders in the path contained '1': [CL:4]
  * 
  * 2019-03-05: 
  *      - More user friendly review of errors in the certificates after printing.
@@ -36,7 +36,6 @@ using System.Diagnostics;
 
 /* TO DO:
  *      - Sikr at filer kan nåes på netværksdrevene, så SVEND kan køres lokalt via genveje.
- *      - Fjernelse af karakter1 ved Hanne Doe medfører ikke en fejl, som det ellers er forventet jf. [CL:2]
  *      - Fill file_documentation with some pretty html.
  *      - Add automatic school address if the student's practical training company is a known school.
  */
@@ -123,7 +122,7 @@ namespace SVEND_2._0
             }
             catch (Exception ex)
             {
-                log_error(ex.ToString());
+                log_error(ex, null);
 
                 // If loading of form1 fails, choose a backup and try again
                 MessageBox.Show("Noget gik galt i indlæsningen af tidligere indstillinger og opsætning. Tryk OK og vælg en af mapperne med angivelsen 'BACKUP YYYY-MM-DD HHMMSS'.\n" +
@@ -138,7 +137,7 @@ namespace SVEND_2._0
                 // Create backup from current setting if form i loaded succesfully
                 if (form1_fully_loaded)
                 {
-                    log_error("SVEND 2.0: Form was loaded succesfully after restoring with a backup.");
+                    log_error(null, "SVEND 2.0: Form was loaded succesfully after restoring with a backup.");
 
                     create_backup();
                 }
@@ -451,7 +450,7 @@ namespace SVEND_2._0
             catch (Exception exception)
             {
                 MessageBox.Show(exception.ToString());
-                log_error(exception.ToString());
+                log_error(exception, null);
                 exit_and_cleanup();
                 return;
             }
@@ -527,7 +526,7 @@ namespace SVEND_2._0
                 catch (Exception exception)
                 {
                     MessageBox.Show(exception.ToString());
-                    log_error(exception.ToString());
+                    log_error(exception, null);
                     exit_and_cleanup();
                     return;
                 }
@@ -817,7 +816,7 @@ namespace SVEND_2._0
                                     }
                                     catch (Exception exception)
                                     {
-                                        log_error(exception.ToString());
+                                        log_error(exception, null);
                                     }
                                 }
 
@@ -829,25 +828,34 @@ namespace SVEND_2._0
 
                                 // Save certificate
                                 string save_as = folder_temp + "(" + defined_specialization + ") " + datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString();
-                                if (!File.Exists(save_as + ".docx"))
+                                try
                                 {
-                                    doc.SaveAs2(save_as);
-                                }
-                                else
-                                {
-                                    // If the file already exists...
-                                    save_as = save_as + "(1)";
                                     if (!File.Exists(save_as + ".docx"))
                                     {
                                         doc.SaveAs2(save_as);
                                     }
                                     else
                                     {
-                                        save_as = save_as.Replace("1", "2");
-                                        doc.SaveAs2(save_as);
+                                        // If the file already exists... 1
+                                        save_as = save_as + "(1)";
+                                        if (!File.Exists(save_as + ".docx"))
+                                        {
+                                            doc.SaveAs2(save_as);
+                                        }
+                                        else
+                                        {
+                                            // If the file already exists... 2
+                                            save_as = save_as + "(2)"; // [CL:4]
+                                            doc.SaveAs2(save_as);
 
-                                        // If more than three students exist with the same name and specializations, it will have to be handled in this code (currently unhandled)
+                                            // If more than three students exist with the same name and specializations, it will have to be handled in this code (currently unhandled)
+                                        }
                                     }
+                                }
+                                catch
+                                {
+                                    MessageBox.Show(save_as);
+                                    // TEST: FJERN DENNE TRY-CATCH
                                 }
 
                                 // Add 'save_as' to a dictionary with specialization as key, so that the correct files can be printed
@@ -893,7 +901,7 @@ namespace SVEND_2._0
                                         }
                                         catch (Exception exception)
                                         {
-                                            log_error(exception.ToString());
+                                            log_error(exception, null);
                                         }
                                     }
 
@@ -940,7 +948,7 @@ namespace SVEND_2._0
                             catch (Exception exception)
                             {
                                 MessageBox.Show(exception.ToString());
-                                log_error(exception.ToString());
+                                log_error(exception, "3a");
                                 exit_and_cleanup();
                                 return;
                             }
@@ -1137,7 +1145,7 @@ namespace SVEND_2._0
                                 catch (Exception exception)
                                 {
                                     MessageBox.Show(exception.ToString());
-                                    log_error(exception.ToString());
+                                    log_error(exception, null);
                                 }
                             }
                         }
@@ -1226,7 +1234,7 @@ namespace SVEND_2._0
                     catch (Exception exception)
                     {
                         MessageBox.Show(exception.ToString());
-                        log_error(exception.ToString());
+                        log_error(exception, null);
                         exit_and_cleanup();
                         return;
                     }
@@ -1705,7 +1713,7 @@ namespace SVEND_2._0
             catch (Exception exception)
             {
                 MessageBox.Show(exception.ToString());
-                log_error(exception.ToString());
+                log_error(exception, null);
                 exit_and_cleanup();
                 return;
             }
@@ -1718,9 +1726,18 @@ namespace SVEND_2._0
             MessageBox.Show("Der er endnu ikke udviklet en funktionalitet i Svend, som kan køre via UiPath." + Environment.NewLine + "Ændr framework under fanen 'Indstillinger' for at køre Svend via .NET.");
         }
 
-        public void log_error(string error)
+        public void log_error(Exception ex, string debugMessage)
         {
-            File.AppendAllText(file_log_error, DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ": " + Environment.NewLine + error + Environment.NewLine + Environment.NewLine, Encoding.GetEncoding(1252));
+            // [CL:3]
+
+            File.AppendAllText(file_log_error, DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ": " + Environment.NewLine + ex.ToString() + Environment.NewLine, Encoding.GetEncoding(1252));
+
+            if (debugMessage != null)
+            {
+                File.AppendAllText(file_log_error, "Developer message: '" + debugMessage + "'" + Environment.NewLine, Encoding.GetEncoding(1252));
+            }
+
+            File.AppendAllText(file_log_error, Environment.NewLine, Encoding.GetEncoding(1252));
         }
 
         public void log_report(string report)
