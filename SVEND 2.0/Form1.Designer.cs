@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.button13 = new System.Windows.Forms.Button();
             this.button12 = new System.Windows.Forms.Button();
             this.richTextBox3 = new System.Windows.Forms.RichTextBox();
             this.label22 = new System.Windows.Forms.Label();
@@ -122,7 +123,6 @@
             this.tabPage8 = new System.Windows.Forms.TabPage();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.label1 = new System.Windows.Forms.Label();
-            this.button13 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView3)).BeginInit();
@@ -186,6 +186,17 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Uddannelsesbeviser";
             this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
+            // 
+            // button13
+            // 
+            this.button13.BackColor = System.Drawing.Color.PeachPuff;
+            this.button13.Location = new System.Drawing.Point(6, 587);
+            this.button13.Name = "button13";
+            this.button13.Size = new System.Drawing.Size(82, 23);
+            this.button13.TabIndex = 17;
+            this.button13.Text = "Afbryd";
+            this.button13.UseVisualStyleBackColor = false;
+            this.button13.Click += new System.EventHandler(this.button13_Click);
             // 
             // button12
             // 
@@ -1153,17 +1164,6 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Her kan du generere uddannelsesbeviser og printe dem i det ønskede format.\r\n";
             this.label1.Click += new System.EventHandler(this.label1_Click);
-            // 
-            // button13
-            // 
-            this.button13.BackColor = System.Drawing.Color.PeachPuff;
-            this.button13.Location = new System.Drawing.Point(6, 587);
-            this.button13.Name = "button13";
-            this.button13.Size = new System.Drawing.Size(82, 23);
-            this.button13.TabIndex = 17;
-            this.button13.Text = "Afbryd";
-            this.button13.UseVisualStyleBackColor = false;
-            this.button13.Click += new System.EventHandler(this.button13_Click);
             // 
             // Form1
             // 

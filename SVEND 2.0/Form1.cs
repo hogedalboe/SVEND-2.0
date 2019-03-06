@@ -22,6 +22,9 @@ using System.Diagnostics;
 
 /* CHANGELOG:
  * 
+ * 2019-03-06:
+ *      - Replaced empty string expression 'str == ""' with string.IsNullOrEmpty(str)
+ * 
  * 2019-03-05: 
  *      - More user friendly review of errors in the certificates after printing.
  *      - User oriented handling of missing or void student data via log_report() and richTextBox: [CL:2]
@@ -32,6 +35,7 @@ using System.Diagnostics;
  */
 
 /* TO DO:
+ *      - Sikr at filer kan nåes på netværksdrevene, så SVEND kan køres lokalt via genveje.
  *      - Fjernelse af karakter1 ved Hanne Doe medfører ikke en fejl, som det ellers er forventet jf. [CL:2]
  *      - Fill file_documentation with some pretty html.
  *      - Add automatic school address if the student's practical training company is a known school.
@@ -532,7 +536,7 @@ namespace SVEND_2._0
             // Remove rows from datatable, if they don't contain a specialization in the column dedicated for the mergefield specialization
             for (int i = 0; i < datatable_csv.Rows.Count; i++)
             {
-                if (datatable_csv.Rows[i].ItemArray[column_header_csv_specialization].ToString() == "")
+                if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[column_header_csv_specialization].ToString()))
                 {
                     datatable_csv.Rows[i].Delete();
                 }
@@ -690,19 +694,6 @@ namespace SVEND_2._0
                                                     }
                                                 }
 
-                                                // Check if the student has received a passing grade
-                                                if (Convert.ToInt32(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Karakter1"].Ordinal]) < 2)
-                                                {
-                                                    log_report("Følgende elev ser ikke ud til at have bestået den afsluttende prøve og er derfor ikke blevet printet:" + Environment.NewLine + "\t- " +
-                                                        datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
-                                                        " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
-
-                                                    // Avoid the files being adding to dictionary_print
-                                                    should_print = false;
-
-                                                    break;
-                                                }
-
                                                 // Replacing "«Elevtype»" with acknowledgement if the student data contains "T" in column "Elevtype"
                                                 if (datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Elevtype"].Ordinal].ToString().Contains("T"))
                                                 {
@@ -712,7 +703,7 @@ namespace SVEND_2._0
                                                 // Check if student data is missing or void [CL:2]
                                                 //
                                                 // Karakter1
-                                                if (datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Karakter1"].Ordinal].ToString() == "")
+                                                if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Karakter1"].Ordinal].ToString()))
                                                 {
                                                     log_report("Der ser ud til at mangle karakter for følgende elev:" + Environment.NewLine + "\t- " +
                                                         datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
@@ -725,7 +716,7 @@ namespace SVEND_2._0
                                                 }
                                                 //
                                                 // Student name
-                                                if (datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() == "")
+                                                if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString()))
                                                 {
                                                     log_report("Der mangler et navn på en elev. Du bør inspicere de uprintede filer for at finde ud af, hvorfor der mangler et navn på eleven." + Environment.NewLine + Environment.NewLine);
 
@@ -736,7 +727,7 @@ namespace SVEND_2._0
                                                 }
                                                 //
                                                 // CPR-nr
-                                                if (datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["CPR-nr."].Ordinal].ToString() == "")
+                                                if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["CPR-nr."].Ordinal].ToString()))
                                                 {
                                                     log_report("Der mangler CPR-nr for eleven:" + Environment.NewLine + "\t- " +
                                                         datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
@@ -760,7 +751,7 @@ namespace SVEND_2._0
                                                 }
                                                 //
                                                 // Aftaleperiode slut
-                                                if (datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Aftaleperiode slut"].Ordinal].ToString() == "")
+                                                if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Aftaleperiode slut"].Ordinal].ToString()))
                                                 {
                                                     log_report("Der mangler en gyldig slutdato for følgende elevs aftaleperiode:" + Environment.NewLine + "\t- " +
                                                         datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
@@ -773,10 +764,10 @@ namespace SVEND_2._0
                                                 }
                                                 //
                                                 // Praktiksted
-                                                if (datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted navn"].Ordinal].ToString() == "" ||
-                                                    datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted adr."].Ordinal].ToString() == "" ||
-                                                    datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted postnr."].Ordinal].ToString() == "" ||
-                                                    datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted postdistrikt"].Ordinal].ToString() == "")
+                                                if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted navn"].Ordinal].ToString()) ||
+                                                    string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted adr."].Ordinal].ToString()) ||
+                                                    string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted postnr."].Ordinal].ToString()) ||
+                                                    string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted postdistrikt"].Ordinal].ToString()))
                                                 {
                                                     log_report("Der mangler en eller flere dele af praktikstedsadressen for:" + Environment.NewLine + "\t- " +
                                                         datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
@@ -788,7 +779,18 @@ namespace SVEND_2._0
                                                     break;
                                                 }
 
+                                                // Check if the student has received a passing grade
+                                                if (Convert.ToInt32(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Karakter1"].Ordinal]) < 2)
+                                                {
+                                                    log_report("Følgende elev ser ikke ud til at have bestået den afsluttende prøve og er derfor ikke blevet printet:" + Environment.NewLine + "\t- " +
+                                                        datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
+                                                        " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
 
+                                                    // Avoid the files being adding to dictionary_print
+                                                    should_print = false;
+
+                                                    break;
+                                                }
 
                                                 //
                                                 //// Skoleadresser
