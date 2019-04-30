@@ -13,12 +13,15 @@ using Word = Microsoft.Office.Interop.Word;
 using System.Diagnostics;
 
 /* ABOUT:
- *      Developed by: Nikolaj Høgedal Boe
- *      For: Industriens Uddannelser
+ *      Developed by Nikolaj Høgedal Boe (nhb@iu.dk;hogedalboe@gmail.com) for Industriens Uddannelser
  *      https://iu.dk/om-os/iu-organisation/about-us/
  * /
 
 /* CHANGELOG:
+ * 
+ * 2019-04-30:
+ *      - Adding string trim to the CSV cells (necessary because the specializations 'Grafisk Tekniker' and 'Mediegrafiker' comes with double quoted cells in their CSV files): [CL:5]
+ *      - Better handling of printing and cleanup: [CL:6]
  * 
  * 2019-03-06:
  *      - Replaced empty string expression 'str == ""' with string.IsNullOrEmpty(str): [CL:2]
@@ -399,10 +402,10 @@ namespace SVEND_2._0
                     string[] headers = sr.ReadLine().Split(';');
                     for (int i = 0; i < headers.Length; i++)
                     {
-                        datatable_csv.Columns.Add(headers[i]);
+                        datatable_csv.Columns.Add(headers[i].Trim('"')); // [CL:5]
 
                         // Get the column number of the column with specializations, so that rows with empty specializations can be remowed
-                        if (headers[i] == header_csv_specialization)
+                        if (headers[i].Trim('"') == header_csv_specialization) // [CL:5]
                         {
                             column_header_csv_specialization = i;
                         }
@@ -415,7 +418,7 @@ namespace SVEND_2._0
                         DataRow dr = datatable_csv.NewRow();
                         for (int i = 0; i < headers.Length; i++)
                         {
-                            dr[i] = cells[i];
+                            dr[i] = cells[i].Trim('"'); // [CL:5]
                         }
                         datatable_csv.Rows.Add(dr);
                     }
@@ -432,7 +435,7 @@ namespace SVEND_2._0
                             DataRow dr = datatable_csv.NewRow();
                             for (int i = 0; i < cells.Length; i++)
                             {
-                                dr[i] = cells[i];
+                                dr[i] = cells[i].Trim('"'); // [CL:5]
                             }
 
                             // Ignore header row
@@ -551,6 +554,7 @@ namespace SVEND_2._0
 
             // Read specializations to array and check if any of the students have specializations which are not specified
             string[] specializations_datatable_csv = datatable_csv.Rows.OfType<DataRow>().Select(k => k[column_header_csv_specialization].ToString()).ToArray(); // Array of the student's specializations in the csv files (datatable)
+
             List<string> nondefined_specializations = new List<string>(); // The list to read non-defined specializations to
             foreach (string student_specialization in specializations_datatable_csv)
             {
@@ -1071,14 +1075,8 @@ namespace SVEND_2._0
                                         if (entry_print.Key == entry_files.Key)
                                         {
                                             // Print
-                                            Microsoft.Office.Interop.Word.Document doc = app.Documents.Open(entry_file);
-
-                                            //doc.PrintOut();
-                                            //
-                                            //
-                                            //
-                                            //
-
+                                            Microsoft.Office.Interop.Word.Document doc = app.Documents.Open(entry_file);                               
+                                            doc.PrintOut();
                                             doc.Close(false);
 
                                             progressBar1.Value++;
@@ -1126,7 +1124,7 @@ namespace SVEND_2._0
 
                                             // Print
                                             Microsoft.Office.Interop.Word.Document doc = app.Documents.Open(entry_file);
-                                            //doc.PrintOut();
+                                            doc.PrintOut();
                                             doc.Close(false);
 
                                             progressBar1.Value++;
@@ -1274,7 +1272,7 @@ namespace SVEND_2._0
             }
         }
 
-        public void exit_and_cleanup()
+        public void exit_and_cleanup(bool keep_folder_temp=true)
         {
             dataGridView3.Hide();
             label34.Hide();
@@ -1296,25 +1294,36 @@ namespace SVEND_2._0
             button11.Text = "Print";
 
             // Delete the user specific temp folder
-            try
+            if (keep_folder_temp) // If the user hasn't been given the possibility to view its content via button12 [CL:6]
             {
-                Directory.Delete(folder_temp, true);
-            }
-            catch
-            {
-                // If this for some reason is impossible (due to a file not having been closed properly): Try to delete as much in the folder as possible
-                System.IO.DirectoryInfo dirInfo_folder_temp = new DirectoryInfo(folder_temp);
                 try
                 {
-                    foreach (FileInfo file in dirInfo_folder_temp.GetFiles())
-                    {
-                        //file.Delete();
-                    }
+                    Directory.Delete(folder_temp, true);
                 }
                 catch
                 {
-                    //
+                    // If this for some reason is impossible (due to a file not having been closed properly): Try to delete as much in the folder as possible
+                    System.IO.DirectoryInfo dirInfo_folder_temp = new DirectoryInfo(folder_temp);
+                    try
+                    {
+                        foreach (FileInfo file in dirInfo_folder_temp.GetFiles())
+                        {
+                            //file.Delete();
+                        }
+                    }
+                    catch
+                    {
+                        //
+                    }
                 }
+            }
+            else
+            {
+                // If there are files in the temp folder, allow the user to view the content of the folder
+                if (Directory.GetFiles(folder_temp).Length > 0)
+                {
+                    button12.Show(); // [CL:6]
+    }
             }
         }
 
@@ -1982,6 +1991,7 @@ namespace SVEND_2._0
                 button13.Hide();
 
                 print_and_finish();
+                exit_and_cleanup(false); // [CL:6]
             }
             else if (button11.Text == "OK")
             {
