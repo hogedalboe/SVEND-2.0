@@ -19,6 +19,9 @@ using System.Diagnostics;
 
 /* CHANGELOG:
  * 
+ * 2019-05-01:
+ *      - Updated documentation html (file_documentation contents) with help from: https://wordtohtml.net/
+ * 
  * 2019-04-30:
  *      - Adding string trim to the CSV cells (necessary because the specializations 'Grafisk Tekniker' and 'Mediegrafiker' comes with double quoted cells in their CSV files): [CL:5]
  *      - Better handling of printing and cleanup: [CL:6]
@@ -38,9 +41,7 @@ using System.Diagnostics;
  */
 
 /* TO DO:
- *      - If the folders 'documentation', 'log' or 'backup' does not exist, then create the directories and fill them with the necessary files (only documentation is essential?).
- *      - Sikr at filer kan nåes på netværksdrevene, så SVEND kan køres lokalt via genveje.
- *      - Fill file_documentation with some pretty html.
+ *      - (If the folders 'documentation', 'log' or 'backup' does not exist, then create the directories and fill them with the necessary files (only documentation is essential?)).
  *      - Add automatic school address if the student's practical training company is a known school.
  */
 
