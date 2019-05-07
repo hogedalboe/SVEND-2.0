@@ -115,11 +115,7 @@
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage6 = new System.Windows.Forms.TabPage();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.tabPage7 = new System.Windows.Forms.TabPage();
-            this.pictureBox10 = new System.Windows.Forms.PictureBox();
-            this.label19 = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
             this.tabPage8 = new System.Windows.Forms.TabPage();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.label1 = new System.Windows.Forms.Label();
@@ -140,10 +136,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
-            this.tabPage6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            this.tabPage7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
             this.tabPage8.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -1072,7 +1064,6 @@
             // 
             // tabPage6
             // 
-            this.tabPage6.Controls.Add(this.pictureBox2);
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Size = new System.Drawing.Size(542, 620);
@@ -1080,61 +1071,14 @@
             this.tabPage6.Text = "Faktura";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
-            // pictureBox2
-            // 
-            this.pictureBox2.ErrorImage = null;
-            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(3, 397);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(536, 52);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox2.TabIndex = 47;
-            this.pictureBox2.TabStop = false;
-            // 
             // tabPage7
             // 
-            this.tabPage7.Controls.Add(this.pictureBox10);
-            this.tabPage7.Controls.Add(this.label19);
-            this.tabPage7.Controls.Add(this.label18);
             this.tabPage7.Location = new System.Drawing.Point(4, 22);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Size = new System.Drawing.Size(542, 620);
             this.tabPage7.TabIndex = 5;
             this.tabPage7.Text = "Funktioner";
             this.tabPage7.UseVisualStyleBackColor = true;
-            // 
-            // pictureBox10
-            // 
-            this.pictureBox10.ErrorImage = null;
-            this.pictureBox10.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox10.Image")));
-            this.pictureBox10.InitialImage = null;
-            this.pictureBox10.Location = new System.Drawing.Point(273, 146);
-            this.pictureBox10.Name = "pictureBox10";
-            this.pictureBox10.Size = new System.Drawing.Size(286, 490);
-            this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox10.TabIndex = 2;
-            this.pictureBox10.TabStop = false;
-            // 
-            // label19
-            // 
-            this.label19.AutoEllipsis = true;
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(18, 66);
-            this.label19.MaximumSize = new System.Drawing.Size(470, 0);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(467, 26);
-            this.label19.TabIndex = 1;
-            this.label19.Text = "Certificeringsnummer til beslagsmede (mail til Hestens Værn + generering af certi" +
-    "ficate supplement og certificeringsnummer=:";
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(18, 14);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(161, 13);
-            this.label18.TabIndex = 0;
-            this.label18.Text = "Kombiner csv-filer til én samlet fil:";
             // 
             // tabPage8
             // 
@@ -1200,11 +1144,6 @@
             this.tabPage5.ResumeLayout(false);
             this.tabPage5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
-            this.tabPage6.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            this.tabPage7.ResumeLayout(false);
-            this.tabPage7.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
             this.tabPage8.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -1239,8 +1178,6 @@
         private System.Windows.Forms.TabPage tabPage8;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.Label label18;
         private System.Windows.Forms.TabPage tabPage6;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.DataGridView dataGridView1;
@@ -1298,8 +1235,6 @@
         private System.Windows.Forms.PictureBox pictureBox5;
         private System.Windows.Forms.PictureBox pictureBox4;
         private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.PictureBox pictureBox10;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextboxColumn2;
         private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn3;

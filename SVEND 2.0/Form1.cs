@@ -20,6 +20,7 @@ using System.Diagnostics;
 /* CHANGELOG:
  * 
  * 2019-05-01:
+ *      - Added automatic fill with school address if it is missing in the CSV data: [CL:7]
  *      - Updated documentation html (file_documentation contents) with help from: https://wordtohtml.net/
  * 
  * 2019-04-30:
@@ -78,6 +79,8 @@ namespace SVEND_2._0
 
         string file_mergefield_student_name = Directory.GetCurrentDirectory() + @"\data\mergefield_student_name";
         string mergefield_student_name = ""; // Used to fill datagridview3 (letters) and to save certificates with the students' names in the files
+
+        string file_svendeprover_schools = Directory.GetCurrentDirectory() + @"\data\svendeprover_schools"; // Used to automatically fill school addresses if they are missing: [CL:7]
 
         string file_user_setup_teamsvendeprover = Directory.GetCurrentDirectory() + @"\settings\user_setup_teamsvendeprover";
         bool bool_user_setup_teamsvendeprover = false;
@@ -456,7 +459,7 @@ namespace SVEND_2._0
             {
                 MessageBox.Show(exception.ToString());
                 log_error(exception, null);
-                exit_and_cleanup();
+                exit_and_cleanup(false, false);
                 return;
             }
 
@@ -532,7 +535,7 @@ namespace SVEND_2._0
                 {
                     MessageBox.Show(exception.ToString());
                     log_error(exception, null);
-                    exit_and_cleanup();
+                    exit_and_cleanup(false, false);
                     return;
                 }
             }
@@ -629,9 +632,9 @@ namespace SVEND_2._0
 
                     // Find matching certificate template file for current specialization
                     file_certificate_template = find_certificate_template(defined_specialization);
-                    if (file_certificate_template == null)
+                    if (file_certificate_template is null)
                     {
-                        exit_and_cleanup();
+                        exit_and_cleanup(false, false);
                         return;
                     }
 
@@ -651,7 +654,10 @@ namespace SVEND_2._0
                         {
                             // Team Svendeprover: Variable to take action if a student has not received a passing grade
                             bool should_print = true;
-                            
+
+                            // Only log missing or void data once per student
+                            bool first_log = true;
+
                             // Open the matching certificate template
                             Microsoft.Office.Interop.Word.Document doc = app.Documents.Open(file_certificate_template);
 
@@ -710,12 +716,17 @@ namespace SVEND_2._0
                                                 // Karakter1
                                                 if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Karakter1"].Ordinal].ToString()))
                                                 {
-                                                    log_report("Der ser ud til at mangle karakter for følgende elev:" + Environment.NewLine + "\t- " +
-                                                        datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
-                                                        " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
+                                                    if (first_log)
+                                                    {
+                                                        log_report("Der ser ud til at mangle karakter for følgende elev:" + Environment.NewLine + "\t- " + 
+                                                           datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() + 
+                                                           " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
 
-                                                    // Avoid the files being adding to dictionary_print
-                                                    should_print = false;
+                                                        // Avoid the files being added to dictionary_print
+                                                        should_print = false;
+
+                                                        first_log = false;
+                                                    }
 
                                                     break;
                                                 }
@@ -723,10 +734,15 @@ namespace SVEND_2._0
                                                 // Student name
                                                 if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString()))
                                                 {
-                                                    log_report("Der mangler et navn på en elev. Du bør inspicere de uprintede filer for at finde ud af, hvorfor der mangler et navn på eleven." + Environment.NewLine + Environment.NewLine);
+                                                    if (first_log)
+                                                    {
+                                                        log_report("Der mangler et navn på en elev. Du bør inspicere de uprintede filer for at finde ud af, hvorfor der mangler et navn på eleven." + Environment.NewLine + Environment.NewLine);
 
-                                                    // Avoid the files being adding to dictionary_print
-                                                    should_print = false;
+                                                        // Avoid the files being adding to dictionary_print
+                                                        should_print = false;
+
+                                                        first_log = false;
+                                                    }
 
                                                     break;
                                                 }
@@ -734,23 +750,33 @@ namespace SVEND_2._0
                                                 // CPR-nr
                                                 if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["CPR-nr."].Ordinal].ToString()))
                                                 {
-                                                    log_report("Der mangler CPR-nr for eleven:" + Environment.NewLine + "\t- " +
-                                                        datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
-                                                        " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
+                                                    if (first_log)
+                                                    {
+                                                        log_report("Der mangler CPR-nr for eleven:" + Environment.NewLine + "\t- " +
+                                                            datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
+                                                            " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
 
-                                                    // Avoid the files being adding to dictionary_print
-                                                    should_print = false;
+                                                        // Avoid the files being adding to dictionary_print
+                                                        should_print = false;
+
+                                                        first_log = false;
+                                                    }
 
                                                     break;
                                                 }
                                                 else if (datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["CPR-nr."].Ordinal].ToString().Length < 10)
                                                 {
-                                                    log_report("Formatet på følgende elevs CPR-nr er for kort:" + Environment.NewLine + "\t- " +
-                                                        datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
-                                                        " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
+                                                    if (first_log)
+                                                    {
+                                                        log_report("Formatet på følgende elevs CPR-nr er for kort:" + Environment.NewLine + "\t- " +
+                                                            datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
+                                                            " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
 
-                                                    // Avoid the files being adding to dictionary_print
-                                                    should_print = false;
+                                                        // Avoid the files being adding to dictionary_print
+                                                        should_print = false;
+
+                                                        first_log = false;
+                                                    }
 
                                                     break;
                                                 }
@@ -758,12 +784,17 @@ namespace SVEND_2._0
                                                 // Aftaleperiode slut
                                                 if (string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Aftaleperiode slut"].Ordinal].ToString()))
                                                 {
-                                                    log_report("Der mangler en gyldig slutdato for følgende elevs aftaleperiode:" + Environment.NewLine + "\t- " +
-                                                        datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
-                                                        " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
+                                                    if (first_log)
+                                                    {
+                                                        log_report("Der mangler en gyldig slutdato for følgende elevs aftaleperiode:" + Environment.NewLine + "\t- " +
+                                                            datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
+                                                            " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
 
-                                                    // Avoid the files being adding to dictionary_print
-                                                    should_print = false;
+                                                        // Avoid the files being adding to dictionary_print
+                                                        should_print = false;
+
+                                                        first_log = false;
+                                                    }
 
                                                     break;
                                                 }
@@ -774,37 +805,73 @@ namespace SVEND_2._0
                                                     string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted postnr."].Ordinal].ToString()) ||
                                                     string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted postdistrikt"].Ordinal].ToString()))
                                                 {
-                                                    log_report("Der mangler en eller flere dele af praktikstedsadressen for:" + Environment.NewLine + "\t- " +
-                                                        datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
-                                                        " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
+                                                    bool missing_address = true;
+                                                    
+                                                    // If the school name exists then check if it is a school and fill out its generic address info [CL:7]
+                                                    if (!string.IsNullOrEmpty(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted navn"].Ordinal].ToString()))
+                                                    {
+                                                        string[] schools = File.ReadAllLines(file_svendeprover_schools, Encoding.GetEncoding(1252));
+                                                        foreach (string school in schools)
+                                                        {
+                                                            string[] address = school.Split(';');
 
-                                                    // Avoid the files being adding to dictionary_print
-                                                    should_print = false;
+                                                            string school_name = address[0].Trim(';');
+                                                            string school_street = address[1].Trim(';');
+                                                            string school_post = address[2].Trim(';');
+                                                            string school_city = address[3].Trim(';');
 
-                                                    break;
+                                                            if (school_name == datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted navn"].Ordinal].ToString())
+                                                            {
+                                                                missing_address = false;
+
+                                                                app.Selection.Find.Execute("«Praktiksted adr.»", missing, missing, missing, missing, missing, missing, missing, missing, school_street, 2);
+                                                                app.Selection.Find.Execute("«Praktiksted postnr.»", missing, missing, missing, missing, missing, missing, missing, missing, school_post, 2);
+                                                                app.Selection.Find.Execute("«Praktiksted postdistrikt»", missing, missing, missing, missing, missing, missing, missing, missing, school_city, 2);
+
+                                                                if (first_log)
+                                                                {
+                                                                    log_report("Automatisk udfyldelse af skoleadresse for: " + Environment.NewLine + "\t- " + 
+                                                                        datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
+                                                                        " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
+                                                                    first_log = false;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    if (missing_address)
+                                                    {
+                                                        if (first_log)
+                                                        {
+                                                            log_report("Der mangler en eller flere dele af praktikstedsadressen for:" + Environment.NewLine + "\t- " + datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() + " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
+
+                                                            // Avoid the files being adding to dictionary_print
+                                                            should_print = false;
+
+                                                            first_log = false;
+                                                        }
+
+                                                        break;
+                                                    }
                                                 }
 
                                                 // Check if the student has received a passing grade
                                                 if (Convert.ToInt32(datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Karakter1"].Ordinal]) < 2)
                                                 {
-                                                    log_report("Følgende elev ser ikke ud til at have bestået den afsluttende prøve og er derfor ikke blevet printet:" + Environment.NewLine + "\t- " +
-                                                        datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
-                                                        " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
+                                                    if (first_log)
+                                                    {
+                                                        log_report("Følgende elev ser ikke ud til at have bestået den afsluttende prøve og er derfor ikke blevet printet:" + Environment.NewLine + "\t- " +
+                                                            datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString() +
+                                                            " (" + defined_specialization + ")" + Environment.NewLine + Environment.NewLine);
 
-                                                    // Avoid the files being adding to dictionary_print
-                                                    should_print = false;
+                                                        // Avoid the files being adding to dictionary_print
+                                                        should_print = false;
+
+                                                        first_log = false;
+                                                    }
 
                                                     break;
                                                 }
-
-                                                //
-                                                //// Skoleadresser
-                                                //
-                                                // Læg mærke til at manglende praktikstedsoplysninger for øjeblikket medfører, at beviset ikke printes. 
-                                                //
-                                                //
-                                                //
-
                                             }
                                         }
                                         else
@@ -834,34 +901,27 @@ namespace SVEND_2._0
 
                                 // Save certificate
                                 string save_as = folder_temp + "(" + defined_specialization + ") " + datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefield_student_name].Ordinal].ToString();
-                                try
+
+                                if (!File.Exists(save_as + ".docx"))
                                 {
+                                    doc.SaveAs2(save_as);
+                                }
+                                else
+                                {
+                                    // If the file already exists... 1
+                                    save_as = save_as + "(1)";
                                     if (!File.Exists(save_as + ".docx"))
                                     {
                                         doc.SaveAs2(save_as);
                                     }
                                     else
                                     {
-                                        // If the file already exists... 1
-                                        save_as = save_as + "(1)";
-                                        if (!File.Exists(save_as + ".docx"))
-                                        {
-                                            doc.SaveAs2(save_as);
-                                        }
-                                        else
-                                        {
-                                            // If the file already exists... 2
-                                            save_as = save_as + "(2)"; // [CL:4]
-                                            doc.SaveAs2(save_as);
+                                        // If the file already exists... 2
+                                        save_as = save_as + "(2)"; // [CL:4]
+                                        doc.SaveAs2(save_as);
 
-                                            // If more than three students exist with the same name and specializations, it will have to be handled in this code (currently unhandled)
-                                        }
+                                        // If more than three students exist with the same name and specializations, it will have to be handled in this code (currently unhandled)
                                     }
-                                }
-                                catch
-                                {
-                                    MessageBox.Show(save_as);
-                                    // TEST: FJERN DENNE TRY-CATCH
                                 }
 
                                 // Add 'save_as' to a dictionary with specialization as key, so that the correct files can be printed
@@ -955,7 +1015,7 @@ namespace SVEND_2._0
                             {
                                 MessageBox.Show(exception.ToString());
                                 log_error(exception, "3a");
-                                exit_and_cleanup();
+                                exit_and_cleanup(false, false);
                                 return;
                             }
 
@@ -1235,7 +1295,7 @@ namespace SVEND_2._0
                     {
                         MessageBox.Show(exception.ToString());
                         log_error(exception, null);
-                        exit_and_cleanup();
+                        exit_and_cleanup(false,false);
                         return;
                     }
                 }
@@ -1273,29 +1333,33 @@ namespace SVEND_2._0
             }
         }
 
-        public void exit_and_cleanup(bool keep_folder_temp=true)
+        public void exit_and_cleanup(bool keep_folder_temp=true, bool show_log_report=true)
         {
-            dataGridView3.Hide();
-            label34.Hide();
-            button11.Hide();
             progressBar1.Value = 0;
             progressBar1.Hide();
+            dataGridView3.Hide();
+            label34.Hide();
             label22.Hide();
-            richTextBox3.Hide();
             button12.Hide();
             button13.Hide();
+
+            // Reset from previous run
+            label34.Text = "Angiv om der skal dannes følgebrev for hver elev:";
+            button11.Text = "Print";
 
             // Reset variables and objects
             dictionary_print.Clear();
             int_files_to_print = 0;
             label22.Text = "";
 
-            // Reset from previous run
-            label34.Text = "Angiv om der skal dannes følgebrev for hver elev:";
-            button11.Text = "Print";
+            if (!show_log_report)
+            {
+                richTextBox3.Hide();
+                button11.Hide();
+            }
 
             // Delete the user specific temp folder
-            if (keep_folder_temp) // If the user hasn't been given the possibility to view its content via button12 [CL:6]
+            if (!keep_folder_temp) // If the user hasn't been given the possibility to view its content via button12 [CL:6]
             {
                 try
                 {
@@ -1324,7 +1388,7 @@ namespace SVEND_2._0
                 if (Directory.GetFiles(folder_temp).Length > 0)
                 {
                     button12.Show(); // [CL:6]
-    }
+                }
             }
         }
 
@@ -1725,7 +1789,7 @@ namespace SVEND_2._0
             {
                 MessageBox.Show(exception.ToString());
                 log_error(exception, null);
-                exit_and_cleanup();
+                exit_and_cleanup(false,false);
                 return;
             }
         }
@@ -1821,6 +1885,21 @@ namespace SVEND_2._0
                 //
                 // Load backups (this catch is important, since checking a checkbox in the last empty row creates an exception)
                 //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
             }
         }
 
@@ -1894,6 +1973,20 @@ namespace SVEND_2._0
 
                 //
                 // Remove the last line!
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
                 //
             }
 
@@ -1992,7 +2085,10 @@ namespace SVEND_2._0
                 button13.Hide();
 
                 print_and_finish();
-                exit_and_cleanup(false); // [CL:6]
+                if (button11.Text == "Print")
+                {
+                    exit_and_cleanup(true); // [CL:6]
+                }
             }
             else if (button11.Text == "OK")
             {
@@ -2001,7 +2097,7 @@ namespace SVEND_2._0
                 label34.Hide();
                 button13.Hide();
 
-                exit_and_cleanup();
+                exit_and_cleanup(true,false);
             }
         }
 
@@ -2047,7 +2143,7 @@ namespace SVEND_2._0
 
         private void button13_Click(object sender, EventArgs e)
         {
-            exit_and_cleanup();
+            exit_and_cleanup(true,false);
         }
     }
 }
