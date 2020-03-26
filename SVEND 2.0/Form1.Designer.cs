@@ -115,10 +115,16 @@
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage6 = new System.Windows.Forms.TabPage();
-            this.tabPage7 = new System.Windows.Forms.TabPage();
-            this.tabPage8 = new System.Windows.Forms.TabPage();
-            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.label1 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
+            this.label27 = new System.Windows.Forms.Label();
+            this.textBox7 = new System.Windows.Forms.TextBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.richTextBox2 = new System.Windows.Forms.RichTextBox();
+            this.label35 = new System.Windows.Forms.Label();
+            this.richTextBox4 = new System.Windows.Forms.RichTextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView3)).BeginInit();
@@ -136,7 +142,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
-            this.tabPage8.SuspendLayout();
+            this.tabPage6.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -147,8 +153,6 @@
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Controls.Add(this.tabPage6);
-            this.tabControl1.Controls.Add(this.tabPage7);
-            this.tabControl1.Controls.Add(this.tabPage8);
             this.tabControl1.ItemSize = new System.Drawing.Size(58, 18);
             this.tabControl1.Location = new System.Drawing.Point(16, 30);
             this.tabControl1.Name = "tabControl1";
@@ -1064,39 +1068,21 @@
             // 
             // tabPage6
             // 
+            this.tabPage6.Controls.Add(this.richTextBox4);
+            this.tabPage6.Controls.Add(this.label35);
+            this.tabPage6.Controls.Add(this.richTextBox2);
+            this.tabPage6.Controls.Add(this.label33);
+            this.tabPage6.Controls.Add(this.textBox7);
+            this.tabPage6.Controls.Add(this.label27);
+            this.tabPage6.Controls.Add(this.checkBox3);
+            this.tabPage6.Controls.Add(this.label19);
+            this.tabPage6.Controls.Add(this.label18);
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Size = new System.Drawing.Size(542, 620);
             this.tabPage6.TabIndex = 7;
-            this.tabPage6.Text = "Faktura";
+            this.tabPage6.Text = "Særregler";
             this.tabPage6.UseVisualStyleBackColor = true;
-            // 
-            // tabPage7
-            // 
-            this.tabPage7.Location = new System.Drawing.Point(4, 22);
-            this.tabPage7.Name = "tabPage7";
-            this.tabPage7.Size = new System.Drawing.Size(542, 620);
-            this.tabPage7.TabIndex = 5;
-            this.tabPage7.Text = "Funktioner";
-            this.tabPage7.UseVisualStyleBackColor = true;
-            // 
-            // tabPage8
-            // 
-            this.tabPage8.Controls.Add(this.webBrowser1);
-            this.tabPage8.Location = new System.Drawing.Point(4, 22);
-            this.tabPage8.Name = "tabPage8";
-            this.tabPage8.Size = new System.Drawing.Size(542, 620);
-            this.tabPage8.TabIndex = 6;
-            this.tabPage8.Text = "Dokumentation";
-            this.tabPage8.UseVisualStyleBackColor = true;
-            // 
-            // webBrowser1
-            // 
-            this.webBrowser1.Location = new System.Drawing.Point(0, -1);
-            this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
-            this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(542, 621);
-            this.webBrowser1.TabIndex = 2;
             // 
             // label1
             // 
@@ -1108,6 +1094,84 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Her kan du generere uddannelsesbeviser og printe dem i det ønskede format.\r\n";
             this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Font = new System.Drawing.Font("Corbel", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label18.Location = new System.Drawing.Point(12, 14);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(76, 18);
+            this.label18.TabIndex = 3;
+            this.label18.Text = "COVID-19:";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(34, 42);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(31, 13);
+            this.label19.TabIndex = 44;
+            this.label19.Text = "Aktiv";
+            // 
+            // checkBox3
+            // 
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Location = new System.Drawing.Point(71, 42);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(15, 14);
+            this.checkBox3.TabIndex = 45;
+            this.checkBox3.UseVisualStyleBackColor = true;
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(34, 64);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(343, 13);
+            this.label27.TabIndex = 46;
+            this.label27.Text = "Karakterværdi, som skal trigge særreglen (læses i kolonnen [karakter1])";
+            // 
+            // textBox7
+            // 
+            this.textBox7.Location = new System.Drawing.Point(58, 80);
+            this.textBox7.Name = "textBox7";
+            this.textBox7.Size = new System.Drawing.Size(432, 20);
+            this.textBox7.TabIndex = 47;
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(34, 108);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(121, 13);
+            this.label33.TabIndex = 48;
+            this.label33.Text = "Tekst som skal erstattes";
+            // 
+            // richTextBox2
+            // 
+            this.richTextBox2.Location = new System.Drawing.Point(58, 124);
+            this.richTextBox2.Name = "richTextBox2";
+            this.richTextBox2.Size = new System.Drawing.Size(432, 96);
+            this.richTextBox2.TabIndex = 49;
+            this.richTextBox2.Text = "";
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(34, 228);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(46, 13);
+            this.label35.TabIndex = 50;
+            this.label35.Text = "Ny tekst";
+            // 
+            // richTextBox4
+            // 
+            this.richTextBox4.Location = new System.Drawing.Point(58, 244);
+            this.richTextBox4.Name = "richTextBox4";
+            this.richTextBox4.Size = new System.Drawing.Size(432, 96);
+            this.richTextBox4.TabIndex = 51;
+            this.richTextBox4.Text = "";
             // 
             // Form1
             // 
@@ -1144,7 +1208,8 @@
             this.tabPage5.ResumeLayout(false);
             this.tabPage5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
-            this.tabPage8.ResumeLayout(false);
+            this.tabPage6.ResumeLayout(false);
+            this.tabPage6.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1157,7 +1222,6 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.TabPage tabPage5;
-        private System.Windows.Forms.TabPage tabPage7;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.RichTextBox richTextBox1;
@@ -1175,7 +1239,6 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TabPage tabPage8;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.TabPage tabPage6;
@@ -1240,8 +1303,16 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn3;
         private System.Windows.Forms.RichTextBox richTextBox3;
         private System.Windows.Forms.Button button12;
-        private System.Windows.Forms.WebBrowser webBrowser1;
         private System.Windows.Forms.Button button13;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.RichTextBox richTextBox4;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.RichTextBox richTextBox2;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.TextBox textBox7;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.CheckBox checkBox3;
     }
 }
 

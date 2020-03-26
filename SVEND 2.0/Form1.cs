@@ -18,6 +18,10 @@ using System.Diagnostics;
  * /
 
 /* CHANGELOG:
+ * 2020-03-26:
+ *      - Corona virus exception text implemented on certificates. Can be toggled under særregler tab: [CL:9]
+ *      - Removed unecessary tabs (including documentation tab functionality).
+ * 
  * 2019-09-13:
  *      - The field 'Elevtype' was always filled with the corresponding column data from the inputted CSV. This did not follow business logic and was changed: [CL:9]
  *      
@@ -117,7 +121,7 @@ namespace SVEND_2._0
         Dictionary<string, List<string>> dictionary_print = new Dictionary<string, List<string>> { }; // Create dictionary to store which paper to print each certificate on
         int int_files_to_print = 0; // Simply to set a maximum for the progress bar when printing
 
-        string file_documentation = Directory.GetCurrentDirectory() + @"\documentation\documentation.html";
+        //string file_documentation = Directory.GetCurrentDirectory() + @"\documentation\documentation.html"; 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,7 +196,7 @@ namespace SVEND_2._0
             button13.Hide();
 
             // Load documentation
-            webBrowser1.Url = new Uri(String.Format("file:///{0}", file_documentation));
+            //webBrowser1.Url = new Uri(String.Format("file:///{0}", file_documentation));
 
             // Get user specific settings
             bool_user_setup_teamsvendeprover = get_binary_file_setting(file_user_setup_teamsvendeprover);
