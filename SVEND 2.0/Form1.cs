@@ -18,6 +18,12 @@ using System.Diagnostics;
  * /
 
 /* CHANGELOG:
+ * 2019-09-13:
+ *      - The field 'Elevtype' was always filled with the corresponding column data from the inputted CSV. This did not follow business logic and was changed: [CL:9]
+ *      
+ * 2019-09-04:
+ *      - Added notification for specific specialization (beslagsmede ('husk certifikat')): [CL:8]
+ *      - Added delay on printing (doc.PrintOut(false)) to ensure that letters are allowed to print before getting dropped from memory.
  * 
  * 2019-05-01:
  *      - Added automatic fill with school address if it is missing in the CSV data: [CL:7]
@@ -612,7 +618,7 @@ namespace SVEND_2._0
             foreach (string defined_specialization in defined_specializations)
             {
                 // If the defined specialization exists in the datatable, do stuff
-                if (specializations_datatable_csv.Contains(defined_specialization))
+                if (specializations_datatable_csv.Contains(defined_specialization)) 
                 {
                     // Add the specialization as key in dictionary_print
                     dictionary_print.Add(defined_specialization, new List<string>());
@@ -646,12 +652,15 @@ namespace SVEND_2._0
                         File.Copy(path_letter_template, path_letter_template_copy);
                     }
 
+                    // Bool to check whether below iteration is the first iteration of a specialization (e.g. Beslagsmed)
+                    bool firstSpecializationLoop = true;
+
                     // Iterate each student row in the datatable
                     for (int i = 0; i < datatable_csv.Rows.Count; i++)
                     {
                         // If the student specialization equals the defined specialization in the current iteration, proceed
                         if (datatable_csv.Rows[i].ItemArray[column_header_csv_specialization].ToString() == defined_specialization)
-                        {
+                        {                            
                             // Team Svendeprover: Variable to take action if a student has not received a passing grade
                             bool should_print = true;
 
@@ -664,11 +673,19 @@ namespace SVEND_2._0
                             // Show progress
                             progressBar1.Value++;
 
+                            // Prompt notification if the specialization is 'beslagsmed'[CL:8]
+                            if (bool_teamsvendeprover)
+                            {
+                                if (defined_specialization == "Beslagsmed" && firstSpecializationLoop)
+                                {
+                                    Form3_Beslagsmed form3 = new Form3_Beslagsmed();
+                                    form3.ShowDialog();
+                                }
+                            }
+
                             // Write relevant datatable data to assigned mergefields in document
                             try
                             {
-                                ///////////////////////////////////////////////////////////////////////
-
                                 // Read mergefields
                                 string[] mergefield_pairs = File.ReadAllLines(file_mergefields, Encoding.GetEncoding(1252));
 
@@ -710,6 +727,10 @@ namespace SVEND_2._0
                                                 {
                                                     app.Selection.Find.Execute("«Elevtype»", missing, missing, missing, missing, missing, missing, missing, missing, "\v\vUddannelsen er gennemført med talentspor", 2);
                                                 }
+                                                else
+                                                {
+                                                    app.Selection.Find.Execute("«Elevtype»", missing, missing, missing, missing, missing, missing, missing, missing, "", 2); // [CL:9]
+    }
 
                                                 // Check if student data is missing or void [CL:2]
                                                 //
@@ -1029,6 +1050,8 @@ namespace SVEND_2._0
                                 //
                             }
                         }
+
+                        firstSpecializationLoop = false;
                     }
 
                     // Delete the matched certificate template
@@ -1137,7 +1160,7 @@ namespace SVEND_2._0
                                         {
                                             // Print
                                             Microsoft.Office.Interop.Word.Document doc = app.Documents.Open(entry_file);                               
-                                            doc.PrintOut();
+                                            doc.PrintOut(false);
                                             doc.Close(false);
 
                                             progressBar1.Value++;
@@ -1185,7 +1208,7 @@ namespace SVEND_2._0
 
                                             // Print
                                             Microsoft.Office.Interop.Word.Document doc = app.Documents.Open(entry_file);
-                                            doc.PrintOut();
+                                            doc.PrintOut(false);
                                             doc.Close(false);
 
                                             progressBar1.Value++;
