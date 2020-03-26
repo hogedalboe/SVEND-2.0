@@ -11,6 +11,8 @@ using System.IO;
 using System.Drawing.Printing;
 using Word = Microsoft.Office.Interop.Word;
 using System.Diagnostics;
+using Microsoft.Office.Interop.Word;
+using System.Runtime.InteropServices;
 
 /* ABOUT:
  *      Developed by Nikolaj Høgedal Boe (nhb@iu.dk;hogedalboe@gmail.com) for Industriens Uddannelser
@@ -19,7 +21,7 @@ using System.Diagnostics;
 
 /* CHANGELOG:
  * 2020-03-26:
- *      - Corona virus exception text implemented on certificates. Can be toggled under særregler tab: [CL:9]
+ *      - Corona virus exception text implemented on certificates. Can be toggled under særregler tab: [CL:10]
  *      - Removed unecessary tabs (including documentation tab functionality).
  * 
  * 2019-09-13:
@@ -123,6 +125,16 @@ namespace SVEND_2._0
 
         //string file_documentation = Directory.GetCurrentDirectory() + @"\documentation\documentation.html"; 
 
+        string file_covid_active = Directory.GetCurrentDirectory() + @"\settings\covid-19\active";
+        string file_covid_trigger = Directory.GetCurrentDirectory() + @"\settings\covid-19\trigger";
+        List<string> files_covid_originals = new List<string>(new string[] { 
+            Directory.GetCurrentDirectory() + @"\settings\covid-19\original_a.docx",
+            Directory.GetCurrentDirectory() + @"\settings\covid-19\original_b.docx",
+            Directory.GetCurrentDirectory() + @"\settings\covid-19\original_c.docx" });
+        string file_covid_replacement = Directory.GetCurrentDirectory() + @"\settings\covid-19\replacement.docx";
+        bool covid_active = false;
+        string covid_trigger = "";
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -173,8 +185,8 @@ namespace SVEND_2._0
             tabPage2.BackColor = backcolor;
             tabPage3.BackColor = backcolor;
             tabPage5.BackColor = backcolor;
-            tabPage7.BackColor = backcolor;
-            tabPage7.BackColor = backcolor;
+            //tabPage7.BackColor = backcolor;
+            //tabPage7.BackColor = backcolor;
 
             // Make size constant
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -197,6 +209,18 @@ namespace SVEND_2._0
 
             // Load documentation
             //webBrowser1.Url = new Uri(String.Format("file:///{0}", file_documentation));
+
+            // Get special rules (COVID-19) [CL:10]
+            covid_active = get_binary_file_setting(file_covid_active);
+            if (covid_active)
+            {
+                checkBox3.Checked = true;
+            }
+            else
+            {
+                checkBox3.Checked = false;
+            }
+            covid_trigger = textBox7.Text = File.ReadAllText(file_covid_trigger, Encoding.GetEncoding(1252));
 
             // Get user specific settings
             bool_user_setup_teamsvendeprover = get_binary_file_setting(file_user_setup_teamsvendeprover);
@@ -407,7 +431,7 @@ namespace SVEND_2._0
             int column_header_csv_specialization = 0; // Used for avoiding rows with empty specialization, as well as finding the specialization column in the main loop
             string csv_folder = File.ReadAllText(folder_csv_students, Encoding.GetEncoding(1252)).Replace(@"C:\Users\%USERPROFILE%", @"C:\Users\" + Environment.UserName); // The directory path as string with files containing students and their data
             string[] csv_files = Directory.GetFiles(csv_folder);
-            DataTable datatable_csv = new DataTable(); // https://stackoverflow.com/questions/1050112/how-to-read-a-csv-file-into-a-net-datatable
+            System.Data.DataTable datatable_csv = new System.Data.DataTable(); // https://stackoverflow.com/questions/1050112/how-to-read-a-csv-file-into-a-net-datatable
             try
             {
                 // Add header once
@@ -687,6 +711,53 @@ namespace SVEND_2._0
                                 }
                             }
 
+                            Object missing = Type.Missing;
+
+                            // Fill in COVID-19 replacement text if necessary [CL:10]
+                            if (covid_active)
+                            {
+                                if (datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Karakter1"].Ordinal].ToString() == covid_trigger)
+                                {
+                                    Word.Application source_app = new Word.Application();
+                                    source_app.DisplayAlerts = WdAlertLevel.wdAlertsNone;
+                                    source_app.Visible = false;
+
+                                    foreach (string source_path in files_covid_originals)
+                                    {
+                                        // Get original text
+                                        Document source_doc = app.Documents.Open(source_path);
+                                        source_doc.ActiveWindow.Selection.WholeStory();
+                                        string original_content = source_doc.ActiveWindow.Selection.Text.Trim();
+                                        source_doc.Close(false);
+                                        Marshal.ReleaseComObject(source_doc);
+
+                                        if (original_content != "" && original_content.Length > 3)
+                                        {
+                                            // Find the text in the current certificate document
+                                            Range range = doc.Content;
+                                            range.Find.Execute(original_content);
+
+                                            if (range.Text == original_content)
+                                            {
+                                                // Get replacement text
+                                                Document replacement_doc = app.Documents.Open(file_covid_replacement);
+                                                replacement_doc.ActiveWindow.Selection.WholeStory();
+                                                string replacement_content = replacement_doc.ActiveWindow.Selection.Text.Trim();
+                                                replacement_doc.Close(false);
+                                                Marshal.ReleaseComObject(replacement_doc);
+
+                                                // Replace
+                                                range.Text = replacement_content;
+                                            }
+                                        }
+                                    }
+
+                                    source_app.Quit();
+
+                                    Marshal.ReleaseComObject(source_app);
+                                }
+                            }
+
                             // Write relevant datatable data to assigned mergefields in document
                             try
                             {
@@ -694,7 +765,6 @@ namespace SVEND_2._0
                                 string[] mergefield_pairs = File.ReadAllLines(file_mergefields, Encoding.GetEncoding(1252));
 
                                 // Iterate mergefield pairs and insert them into document
-                                Object missing = Type.Missing;
                                 foreach (string mergefield_pair in mergefield_pairs)
                                 {
                                     string[] mergefields = mergefield_pair.Split(';');
@@ -2049,6 +2119,7 @@ namespace SVEND_2._0
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
             File.WriteAllText(file_mergefield_specialization, textBox5.Text, Encoding.GetEncoding(1252));
+            mergefield_specialization = textBox5.Text;
         }
 
         private void button9_Click(object sender, EventArgs e)
@@ -2086,6 +2157,7 @@ namespace SVEND_2._0
         private void textBox6_TextChanged(object sender, EventArgs e)
         {
             File.WriteAllText(file_mergefield_student_name, textBox6.Text, Encoding.GetEncoding(1252));
+            mergefield_specialization = textBox6.Text;
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
@@ -2171,6 +2243,50 @@ namespace SVEND_2._0
         private void button13_Click(object sender, EventArgs e)
         {
             exit_and_cleanup(true,false);
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            string binary_bool = "";
+
+            if (checkBox3.Checked == true)
+            {
+                binary_bool = "1";
+                covid_active = true;
+            }
+            else
+            {
+                binary_bool = "0";
+                covid_active = false;
+            }
+
+            File.WriteAllText(file_covid_active, binary_bool);
+        }
+
+        private void textBox7_TextChanged(object sender, EventArgs e)
+        {
+            File.WriteAllText(file_covid_trigger, textBox7.Text, Encoding.GetEncoding(1252));
+            covid_trigger = textBox7.Text;
+        }
+
+        private void button15_Click(object sender, EventArgs e)
+        {
+            Process.Start(files_covid_originals[0]);
+        }
+
+        private void button14_Click(object sender, EventArgs e)
+        {
+            Process.Start(files_covid_originals[1]);
+        }
+
+        private void button16_Click(object sender, EventArgs e)
+        {
+            Process.Start(files_covid_originals[2]);
+        }
+
+        private void button17_Click(object sender, EventArgs e)
+        {
+            Process.Start(file_covid_replacement);
         }
     }
 }
