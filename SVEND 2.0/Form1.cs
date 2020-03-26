@@ -23,6 +23,7 @@ using System.Runtime.InteropServices;
  * 2020-03-26:
  *      - Corona virus exception text implemented on certificates. Can be toggled under særregler tab: [CL:10]
  *      - Removed unecessary tabs (including documentation tab functionality).
+ *      - Including the covid-19 folder in backup [CL:11]
  * 
  * 2019-09-13:
  *      - The field 'Elevtype' was always filled with the corresponding column data from the inputted CSV. This did not follow business logic and was changed: [CL:9]
@@ -125,6 +126,7 @@ namespace SVEND_2._0
 
         //string file_documentation = Directory.GetCurrentDirectory() + @"\documentation\documentation.html"; 
 
+        string folder_covid = Directory.GetCurrentDirectory() + @"\settings\covid-19\";
         string file_covid_active = Directory.GetCurrentDirectory() + @"\settings\covid-19\active";
         string file_covid_trigger = Directory.GetCurrentDirectory() + @"\settings\covid-19\trigger";
         List<string> files_covid_originals = new List<string>(new string[] { 
@@ -1418,8 +1420,20 @@ namespace SVEND_2._0
                     {
                         string file_new_backup = subfolder_new_backup + file.Replace(directory, "");
                         File.Copy(file, file_new_backup);
-                    }
+                    }                    
                 }
+            }
+
+            // Copy the COVID-19 folder to backup [CL:11]
+            string folder_covid_backup = folder_new_backup + @"settings\covid-19\";
+            Directory.CreateDirectory(folder_covid_backup);
+
+            string[] covid_files = Directory.GetFiles(folder_covid);
+            foreach (string covid_file in covid_files)
+            {
+                string name = Path.GetFileName(covid_file);
+                string dest = Path.Combine(folder_covid_backup, name);
+                File.Copy(covid_file, dest);
             }
 
             // Remove the oldest backup
