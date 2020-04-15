@@ -779,12 +779,6 @@ namespace SVEND_2._0
                                         // If there is a complete mergefield pair
                                         if (mergefields.Length > 1)
                                         {
-                                            //-------------------------------------------------------------------------------------------------------
-                                            ///---------------------------------------------------------------------------------------------------------------
-                                            app.Selection.Find.Execute(mergefields[1], missing, missing, missing, missing, missing, missing, missing, missing, datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefields[0]].Ordinal].ToString(), 2); // https://stackoverflow.com/questions/11340264/get-index-of-datatable-column-with-name
-                                            ///---------------------------------------------------------------------------------------------------------------
-                                            //-------------------------------------------------------------------------------------------------------
-
                                             // Specific certificate formats for Team Svendeprover
                                             if (bool_teamsvendeprover)
                                             {
@@ -809,7 +803,7 @@ namespace SVEND_2._0
                                                 else
                                                 {
                                                     app.Selection.Find.Execute("«Elevtype»", missing, missing, missing, missing, missing, missing, missing, missing, "", 2); // [CL:9]
-    }
+                                                }                                           
 
                                                 // Check if student data is missing or void [CL:2]
                                                 //
@@ -921,12 +915,12 @@ namespace SVEND_2._0
                                                             string school_city = address[3].Trim(';');
 
                                                             if (school_name == datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns["Praktiksted navn"].Ordinal].ToString())
-                                                            {
+                                                            {                                                                
                                                                 missing_address = false;
 
-                                                                app.Selection.Find.Execute("«Praktiksted adr.»", missing, missing, missing, missing, missing, missing, missing, missing, school_street, 2);
-                                                                app.Selection.Find.Execute("«Praktiksted postnr.»", missing, missing, missing, missing, missing, missing, missing, missing, school_post, 2);
-                                                                app.Selection.Find.Execute("«Praktiksted postdistrikt»", missing, missing, missing, missing, missing, missing, missing, missing, school_city, 2);
+                                                                app.Selection.Find.Execute("«Praktiksted_adr»", missing, missing, missing, missing, missing, missing, missing, missing, school_street, 2);
+                                                                app.Selection.Find.Execute("«Praktiksted_postnr»", missing, missing, missing, missing, missing, missing, missing, missing, school_post, 2);
+                                                                app.Selection.Find.Execute("«Praktiksted_postdistrikt»", missing, missing, missing, missing, missing, missing, missing, missing, school_city, 2);
 
                                                                 if (first_log)
                                                                 {
@@ -973,6 +967,13 @@ namespace SVEND_2._0
                                                     break;
                                                 }
                                             }
+
+                                            //-------------------------------------------------------------------------------------------------------
+                                            ///---------------------------------------------------------------------------------------------------------------
+                                            app.Selection.Find.Execute(mergefields[1], missing, missing, missing, missing, missing, missing, missing, missing, datatable_csv.Rows[i].ItemArray[datatable_csv.Rows[i].Table.Columns[mergefields[0]].Ordinal].ToString(), 2); // https://stackoverflow.com/questions/11340264/get-index-of-datatable-column-with-name
+                                            ///---------------------------------------------------------------------------------------------------------------
+                                            //-------------------------------------------------------------------------------------------------------
+
                                         }
                                         else
                                         {
