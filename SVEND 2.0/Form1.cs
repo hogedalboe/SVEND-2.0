@@ -21,8 +21,8 @@ using System.Runtime.InteropServices;
 
 /* CHANGELOG:
  * 2020-04-15:
- *      - Identified where to handle pre-defined school addresses in case of missing addresses for practical training companies: [CL:12]
- *      
+ *      - Realized that automatic filling of school address [CL:7] was never correctly implemented. It does not work.
+ *    
  * 2020-03-26:
  *      - Corona virus exception text implemented on certificates. Can be toggled under særregler tab: [CL:10]
  *      - Removed unecessary tabs (including documentation tab functionality).
@@ -952,20 +952,6 @@ namespace SVEND_2._0
                                                         }
 
                                                         break;
-                                                    }
-                                                    else
-                                                    {
-                                                        // Add pre-defined school address here [CL:12]
-                                                        //
-                                                        //
-                                                        //
-                                                        //
-                                                        //
-                                                        //
-                                                        //
-                                                        //
-                                                        //
-                                                        //
                                                     }
                                                 }
 
