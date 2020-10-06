@@ -20,6 +20,9 @@ using System.Runtime.InteropServices;
  * /
 
 /* CHANGELOG:
+ * 2020-07-16:
+ *      - Problem with ommitting printing of letters by unchecking checkbox. Fixed by correcting previously errornous code.: [CL:12]
+ * 
  * 2020-04-15:
  *      - Realized that automatic filling of school address [CL:7] was never correctly implemented. It does not work.
  *    
@@ -515,7 +518,7 @@ namespace SVEND_2._0
                     for (int i = 0; i < datatable_csv.Rows.Count; i++)
                     {
                         int name_column = 0;
-                        int specialization_column = 0; // Double declaration: column_header_csv_specialization
+                        // int specialization_column = 0; // Double declaration: column_header_csv_specialization [CL:12]
 
                         foreach (DataColumn datatable_column in datatable_csv.Columns)
                         {
@@ -524,11 +527,14 @@ namespace SVEND_2._0
                             {
                                 name_column = datatable_column.Ordinal; // https://stackoverflow.com/questions/11340264/get-index-of-datatable-column-with-name
                             }
+
                             // Get the column with the specialization
-                            else if (datatable_column.ColumnName == mergefield_specialization)
+                            /* [CL:12]
+                            if (datatable_column.ColumnName == mergefield_specialization)
                             {
                                 specialization_column = datatable_column.Ordinal;
                             }
+                            */
                         }
 
                         DataGridViewRow grid_row = (DataGridViewRow)dataGridView3.Rows[i].Clone();
@@ -561,8 +567,12 @@ namespace SVEND_2._0
                         // Student column
                         grid_row.Cells[0].Value = datatable_csv.Rows[i].ItemArray[name_column] + dublicate_indicator;
 
+
                         // Specialization column
-                        grid_row.Cells[1].Value = datatable_csv.Rows[i].ItemArray[specialization_column];
+                        // grid_row.Cells[1].Value = datatable_csv.Rows[i].ItemArray[specialization_column]; // [CL:12]
+                        grid_row.Cells[1].Value = datatable_csv.Rows[i].ItemArray[column_header_csv_specialization];
+
+                        MessageBox.Show(grid_row.Cells[1].Value.ToString());
 
                         dataGridView3.Rows.Add(grid_row);
 
@@ -740,9 +750,10 @@ namespace SVEND_2._0
                                         {
                                             // Find the text in the current certificate document
                                             Range range = doc.Content;
-                                            range.Find.Execute(original_content);
+                                            bool isfound = range.Find.Execute(original_content);
 
-                                            if (range.Text == original_content)
+                                            //if (range.Text == original_content)
+                                            if (isfound)
                                             {
                                                 // Get replacement text
                                                 Document replacement_doc = app.Documents.Open(file_covid_replacement);
@@ -1160,7 +1171,7 @@ namespace SVEND_2._0
                 button11.Show(); // Calls print_and_finish()
                 button13.Show(); // Calls exit_and_cleanup()
             }
-            // Otherwise just give the option of printing or BORTING
+            // Otherwise just give the option of printing or ABORTING
             else
             {
                 button11.Show(); // Calls print_and_finish()
